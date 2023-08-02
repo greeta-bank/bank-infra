@@ -69,7 +69,7 @@ resource "kubernetes_deployment_v1" "gateway_deployment" {
         }               
         
         container {
-          image = "ghcr.io/greeta-erp/gateway-service:2acb569305cb5f6d8da4d64d54fd23a15b43c956"
+          image = "ghcr.io/greeta-bank/gateway-service:2acb569305cb5f6d8da4d64d54fd23a15b43c956"
           name  = "gateway"
           image_pull_policy = "Always"
           port {

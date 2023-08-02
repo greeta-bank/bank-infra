@@ -1,3 +1,12 @@
+ resource "kubernetes_config_map_v1" "account_postgres_config_map" {
+   metadata {
+     name = "account-postgres-dbcreation-script"
+   }
+   data = {
+    "account-db.sql" = "${file("${path.module}/account-db.sql")}"
+   }
+ } 
+
 resource "kubernetes_deployment_v1" "account_postgres" {
   metadata {
     name = "account-postgres"
@@ -22,14 +31,24 @@ resource "kubernetes_deployment_v1" "account_postgres" {
       }
 
       spec {
+        volume {
+          name = "account-postgres-dbcreation-script"
+          config_map {
+            name = kubernetes_config_map_v1.account_postgres_config_map.metadata.0.name 
+          }
+        }          
         container {
           name  = "account-postgres"
           image = "postgres:14.4"
 
           env {
             name  = "POSTGRES_PASSWORD"
-            value = "techbankRootPsw"
+            value = "techbankrootpsw"
           }
+          volume_mount {
+            name = "account-postgres-dbcreation-script"
+            mount_path = "/docker-entrypoint-initdb.d"
+          }           
 
         }
       }

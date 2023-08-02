@@ -1,5 +1,5 @@
 resource "kubernetes_deployment_v1" "kafka_ui" {
-  depends_on = [helm_release.bitnami_kafka_schema_registry]
+  depends_on = [helm_release.bitnami_kafka]
   metadata {
     name = "kafka-ui"
   }
