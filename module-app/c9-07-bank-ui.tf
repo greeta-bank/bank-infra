@@ -1,9 +1,9 @@
-resource "kubernetes_deployment_v1" "movie_ui_deployment" {
-  depends_on = [kubernetes_deployment_v1.movie_deployment]
+resource "kubernetes_deployment_v1" "bank_ui_deployment" {
+  depends_on = [kubernetes_deployment_v1.bank_deployment]
   metadata {
-    name = "movie-ui"
+    name = "bank-ui"
     labels = {
-      app = "movie-ui"
+      app = "bank-ui"
     }
   }
  
@@ -11,19 +11,19 @@ resource "kubernetes_deployment_v1" "movie_ui_deployment" {
     replicas = 1
     selector {
       match_labels = {
-        app = "movie-ui"
+        app = "bank-ui"
       }
     }
     template {
       metadata {
         labels = {
-          app = "movie-ui"
+          app = "bank-ui"
         }
       }
       spec {
         container {
-          image = "ghcr.io/greeta-erp/erp-ui"
-          name  = "movie-ui"
+          image = "ghcr.io/greeta-bank/bank-ui"
+          name  = "bank-ui"
           image_pull_policy = "Always"
           port {
             container_port = 4200
@@ -35,9 +35,9 @@ resource "kubernetes_deployment_v1" "movie_ui_deployment" {
 }
 
 # Resource: Keycloak Server Horizontal Pod Autoscaler
-resource "kubernetes_horizontal_pod_autoscaler_v1" "movie_ui_hpa" {
+resource "kubernetes_horizontal_pod_autoscaler_v1" "bank_ui_hpa" {
   metadata {
-    name = "movie-ui-hpa"
+    name = "bank-ui-hpa"
   }
   spec {
     max_replicas = 2
@@ -45,19 +45,19 @@ resource "kubernetes_horizontal_pod_autoscaler_v1" "movie_ui_hpa" {
     scale_target_ref {
       api_version = "apps/v1"
       kind = "Deployment"
-      name = kubernetes_deployment_v1.movie_ui_deployment.metadata[0].name
+      name = kubernetes_deployment_v1.bank_ui_deployment.metadata[0].name
     }
-    target_cpu_utilization_percentage = 50
+    target_cpu_utilization_percentage = 80
   }
 }
 
-resource "kubernetes_service_v1" "movie_ui_service" {
+resource "kubernetes_service_v1" "bank_ui_service" {
   metadata {
-    name = "movie-ui"
+    name = "bank-ui"
   }
   spec {
     selector = {
-      app = "movie-ui"
+      app = "bank-ui"
     }
     port {
       port = 4200

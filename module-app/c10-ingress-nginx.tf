@@ -5,12 +5,6 @@ resource "kubernetes_ingress_v1" "ingress" {
     annotations = {
       "nginx.ingress.kubernetes.io/rewrite-target" = "/"
       "kubernetes.io/ingress.class" =  "nginx"
-      "nginx.ingress.kubernetes.io/proxy-set-header" = <<EOF
-        Host $host;
-        X-Real-IP $remote_addr;
-        X-Forwarded-For $proxy_add_x_forwarded_for;
-        X-Forwarded-Proto $scheme;
-      EOF
     }  
   }
 
@@ -28,7 +22,7 @@ resource "kubernetes_ingress_v1" "ingress" {
     }     
 
     rule {
-      host = "erp.greeta.net"
+      host = "account.greeta.net"
       http {
 
         path {
@@ -68,13 +62,13 @@ resource "kubernetes_ingress_v1" "ingress" {
     }    
 
     rule {
-      host = "admin.greeta.net"
+      host = "kafka.greeta.net"
       http {
 
         path {
           backend {
             service {
-              name = "admin"
+              name = "kafka-ui"
               port {
                 number = 8080
               }
@@ -86,66 +80,6 @@ resource "kubernetes_ingress_v1" "ingress" {
         }
       }
     }
-
-    rule {
-      host = "dep.greeta.net"
-      http {
-
-        path {
-          backend {
-            service {
-              name = "department"
-              port {
-                number = 8080
-              }
-            }
-          }
-
-          path = "/"
-          path_type = "Prefix"
-        }
-      }
-    }
-
-    rule {
-      host = "emp.greeta.net"
-      http {
-
-        path {
-          backend {
-            service {
-              name = "employee"
-              port {
-                number = 8080
-              }
-            }
-          }
-
-          path = "/"
-          path_type = "Prefix"
-        }
-      }
-    }  
-
-    rule {
-      host = "org.greeta.net"
-      http {
-
-        path {
-          backend {
-            service {
-              name = "organization"
-              port {
-                number = 8080
-              }
-            }
-          }
-
-          path = "/"
-          path_type = "Prefix"
-        }
-      }
-    } 
 
     rule {
       host = "grafana.greeta.net"
@@ -168,13 +102,13 @@ resource "kubernetes_ingress_v1" "ingress" {
     } 
 
     rule {
-      host = "movie.greeta.net"
+      host = "bank.greeta.net"
       http {
 
         path {
           backend {
             service {
-              name = "movie-ui"
+              name = "bank-ui"
               port {
                 number = 4200
               }

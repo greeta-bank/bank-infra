@@ -1,6 +1,42 @@
 spring:
   application:
-    name: employee
+    name: account-query
+  jpa:
+    # postgreSQL jpa settings
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    # MySQL jpa settings
+  #    database-platform: org.hibernate.dialect.MySQL8Dialect
+  #    show-sql: true
+  #    hibernate:
+  #      ddl-auto: update
+  datasource:
+    # postgreSQL datasource settings
+    initialization-mode: always
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/bankAccount
+    username: postgres
+    password: techbankRootPsw
+    #MySQL datasource settings
+  #    url: jdbc:mysql://localhost:3306/bankAccount?createDatabaseIfNotExist=true
+  #    username: root
+  #    password: techbankRootPsw
+  kafka:
+    listener:
+      ack-mode: MANUAL_IMMEDIATE
+    consumer:
+      bootstrap-servers: bitnami-kafka:9092
+      group-id: bankaccConsumer
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'
   output:
     ansi:
       enabled: ALWAYS
@@ -15,15 +51,15 @@ spring:
 
 
 logging:
-  pattern: 
-    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"  
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
   level:
     org.springframework.cloud.kubernetes: TRACE
     org.springframework.security: DEBUG
 
 info:
-  system: Employee Service
+  system: Account Query Service
 
 jwt:
   auth:
@@ -53,13 +89,14 @@ management:
     tags:
       application: ${spring.application.name}
 
+
 server:
   forward-headers-strategy: framework
 
 openapi:
   oauthflow:
     authServerUrl: https://keycloak.greeta.net
-    realm: erp-realm
+    realm: bank-realm
 
 account-app:
   base-url: https://account.greeta.net

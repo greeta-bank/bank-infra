@@ -1,6 +1,18 @@
 spring:
   application:
-    name: employee
+    name: bank
+  datasource:
+    url: jdbc:mysql://bank-mysql:3306/eazybank
+    username: root
+    password: dbpassword11
+  jpa:
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+  sql:
+    init:
+      mode: NEVER
+      schema-locations: classpath:init-schema.sql,classpath:init-data.sql
   output:
     ansi:
       enabled: ALWAYS
@@ -15,15 +27,15 @@ spring:
 
 
 logging:
-  pattern: 
-    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"  
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
   level:
     org.springframework.cloud.kubernetes: TRACE
     org.springframework.security: DEBUG
 
 info:
-  system: Employee Service
+  system: Bank Service
 
 jwt:
   auth:
@@ -59,7 +71,7 @@ server:
 openapi:
   oauthflow:
     authServerUrl: https://keycloak.greeta.net
-    realm: erp-realm
+    realm: bank-realm
 
 account-app:
   base-url: https://account.greeta.net
@@ -67,4 +79,4 @@ account-app:
 
 bank-app:
   base-url: https://bank.greeta.net
-  redirect-url: ${bank-app.base-url}
+  redirect-url: ${bank-app.base-url}      

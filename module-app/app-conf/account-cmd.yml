@@ -1,6 +1,16 @@
 spring:
   application:
-    name: employee
+    name: account-cmd
+  data:
+    mongodb:
+      host: mongodb
+      database: bankAccount
+      authentication-database: admin
+  kafka:
+    producer:
+      bootstrap-servers: bitnami-kafka:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   output:
     ansi:
       enabled: ALWAYS
@@ -15,15 +25,15 @@ spring:
 
 
 logging:
-  pattern: 
-    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"  
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
   level:
     org.springframework.cloud.kubernetes: TRACE
     org.springframework.security: DEBUG
 
 info:
-  system: Employee Service
+  system: Account Command Service
 
 jwt:
   auth:
@@ -53,13 +63,14 @@ management:
     tags:
       application: ${spring.application.name}
 
+
 server:
   forward-headers-strategy: framework
 
 openapi:
   oauthflow:
     authServerUrl: https://keycloak.greeta.net
-    realm: erp-realm
+    realm: bank-realm
 
 account-app:
   base-url: https://account.greeta.net

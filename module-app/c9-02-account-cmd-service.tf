@@ -1,19 +1,19 @@
-resource "kubernetes_config_map_v1" "organization" {
+resource "kubernetes_config_map_v1" "account_cmd" {
   metadata {
-    name      = "organization"
+    name      = "account-cmd"
     labels = {
-      app = "organization"
+      app = "account-cmd"
     }
   }
 
   data = {
-    "application.properties" = file("${path.module}/app-conf/organization.properties")
+    "application.yml" = file("${path.module}/app-conf/account-cmd.yml")
   }
 }
 
-resource "kubernetes_secret_v1" "organization" {
+resource "kubernetes_secret_v1" "account_cmd" {
   metadata {
-    name = "organization"
+    name = "account-cmd"
   }
 
   data = {
@@ -25,12 +25,12 @@ resource "kubernetes_secret_v1" "organization" {
 }
 
 
-resource "kubernetes_deployment_v1" "organization_deployment" {
+resource "kubernetes_deployment_v1" "account_cmd_deployment" {
   depends_on = [kubernetes_deployment_v1.mongodb]
   metadata {
-    name = "organization"
+    name = "account-cmd"
     labels = {
-      app = "organization"
+      app = "account-cmd"
     }
   }
  
@@ -38,13 +38,13 @@ resource "kubernetes_deployment_v1" "organization_deployment" {
     replicas = 1
     selector {
       match_labels = {
-        app = "organization"
+        app = "account-cmd"
       }
     }
     template {
       metadata {
         labels = {
-          app = "organization"
+          app = "account-cmd"
         }
         annotations = {
           "prometheus.io/scrape" = "true"
@@ -52,14 +52,16 @@ resource "kubernetes_deployment_v1" "organization_deployment" {
           "prometheus.io/port"   = "8080"
         }        
       }
+
       spec {
-        service_account_name = "spring-cloud-kubernetes"
+
+        service_account_name = "spring-cloud-kubernetes"         
         
         container {
-          image = "ghcr.io/greeta-erp/organization-service:dc28f57a8b60f7a5e2c361ada321af08bbf82a57"
-          name  = "organization"
+          image = "ghcr.io/greeta-bank/account-cmd-service:dc28f57a8b60f7a5e2c361ada321af08bbf82a57"
+          name  = "account-cmd"
           image_pull_policy = "Always"
-          
+
           port {
             container_port = 8080
           }
@@ -81,7 +83,7 @@ resource "kubernetes_deployment_v1" "organization_deployment" {
 
           env {
             name  = "OTEL_SERVICE_NAME"
-            value = "organization"
+            value = "bank"
           }
 
           env {
@@ -103,7 +105,7 @@ resource "kubernetes_deployment_v1" "organization_deployment" {
           #     memory = "756Mi"
           #     cpu    = "2"
           #   }
-          # }          
+          # }
 
           lifecycle {
             pre_stop {
@@ -112,7 +114,7 @@ resource "kubernetes_deployment_v1" "organization_deployment" {
               }
             }
           }
-
+          
           # liveness_probe {
           #   http_get {
           #     path = "/actuator/health/liveness"
@@ -129,17 +131,17 @@ resource "kubernetes_deployment_v1" "organization_deployment" {
           #   }
           #   initial_delay_seconds = 20
           #   period_seconds        = 15
-          # }   
-
+          # }      
+                               
         }
       }
     }
   }
 }
 
-resource "kubernetes_horizontal_pod_autoscaler_v1" "organization_hpa" {
+resource "kubernetes_horizontal_pod_autoscaler_v1" "account_cmd_hpa" {
   metadata {
-    name = "organization-hpa"
+    name = "account-cmd-hpa"
   }
   spec {
     max_replicas = 2
@@ -147,23 +149,19 @@ resource "kubernetes_horizontal_pod_autoscaler_v1" "organization_hpa" {
     scale_target_ref {
       api_version = "apps/v1"
       kind = "Deployment"
-      name = kubernetes_deployment_v1.organization_deployment.metadata[0].name 
+      name = kubernetes_deployment_v1.account_cmd_deployment.metadata[0].name 
     }
     target_cpu_utilization_percentage = 70
   }
 }
 
-resource "kubernetes_service_v1" "organization_service" {
+resource "kubernetes_service_v1" "account_cmd_service" {
   metadata {
-    name = "organization"
-    labels = {
-      app = "organization"
-      spring-boot = "true"
-    }
+    name = "account-cmd"
   }
   spec {
     selector = {
-      app = "organization"
+      app = "account-cmd"
     }
     port {
       port = 8080

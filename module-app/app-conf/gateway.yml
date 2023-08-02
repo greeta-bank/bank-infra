@@ -10,25 +10,16 @@ spring:
       ribbon:
         enabled: false
     gateway:
-      # default-filters:
-      #   - SaveSession
-      #   - TokenRelay    
       default-filters:
+        - SaveSession
         - TokenRelay
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Request-Headers
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Request-Headers, RETAIN_FIRST
       globalcors:
         add-to-simple-url-handler-mapping: true
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: 
-              - HEAD
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - PATCH
-              - OPTIONS
+            allowedOrigins: "https://bank.greeta.net"
+            allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
       discovery:
@@ -41,88 +32,63 @@ spring:
             - Path=/employee/**
           filters:
             - RewritePath=/employee/(?<path>.*), /$\{path}
-        - id: department
-          uri: http://department:8080
+        - id: account-cmd
+          uri: http://account-cmd:8080
           predicates:
-            - Path=/department/**
+            - Path=/account-cmd/**
           filters:
-            - RewritePath=/department/(?<path>.*), /$\{path}
-        - id: organization
-          uri: http://organization:8080
+            - RewritePath=/account-cmd/(?<path>.*), /$\{path}
+        - id: account-query
+          uri: http://account-query:8080
           predicates:
-            - Path=/organization/**
+            - Path=/account-query/**
           filters:
-            - RewritePath=/organization/(?<path>.*), /$\{path}
-        - id: movie
-          uri: http://movie:8080
+            - RewritePath=/account-query/(?<path>.*), /$\{path}            
+        - id: bank
+          uri: http://bank:8080
           predicates:
-            - Path=/movie/**
+            - Path=/bank/**
           filters:
-            - RewritePath=/movie/(?<path>.*), /$\{path}
+            - RewritePath=/bank/(?<path>.*), /$\{path}
   keycloak:
       server-url: http://keycloak-server:8080
 
-  # redis:
-  #   connect-timeout: 2s
-  #   host: localhost
-  #   port: 6379
-  #   timeout: 1s
-  # session:
-  #   store-type: redis
-  #   timeout: 10m
-  #   redis:
-  #     namespace: polar:edge
+  redis:
+    connect-timeout: 2s
+    host: gateway-redis
+    port: 6379
+    timeout: 1s
+  session:
+    store-type: redis
+    timeout: 10m
+    redis:
+      namespace: bank:gateway
   security:
     oauth2: 
-      # client:
-      #   registration:
-      #     keycloak:
-      #       client-id: erp-app
-      #       scope: openid,roles
-      # ##     keycloak:
-      #       # redirect-uri: https://books-api.greeta.net/login/oauth2/code/keycloak
-      #       # client-secret: 1b1b19599c2264fd218c
-
-      #   provider:
-      #     keycloak:
-      #       issuer-uri: http://keycloak-server:8080/realms/erp-realm
-      #       authorization-uri: https://keycloak.greeta.net/realms/erp-realm/protocol/openid-connect/auth
-      #       # token-uri: https://keycloak.greeta.net/realms/erp-realm/protocol/openid-connect/token
       resourceserver:
         jwt:
-          issuer-uri: https://keycloak.greeta.net/realms/erp-realm
-          jwk-set-uri: ${spring.keycloak.server-url}/realms/erp-realm/protocol/openid-connect/certs
-
-# keycloak:
-#   auth-server-url: ${spring.keycloak.server-url}  
-#   realm: erp-realm
-#   resource: erp-app
-#   ssl-required: external
-#   principal-attribute: preferred_username
-#   use-resource-role-mappings: true          
+          issuer-uri: ${spring.keycloak.server-url}/realms/bank-realm
+          jwk-set-uri: ${spring.keycloak.server-url}/realms/bank-realm/protocol/openid-connect/certs
+       
 
 jwt:
   auth:
     converter:
-      resource-id: erp-app
+      resource-id: bank-app
       principal-attribute: preferred_username
 
-# app:
-#   redirect-url:
-#   # cors:
-#   #   allowed-origins: ${erp-app.base-url}
+account-app:
+  base-url: https://account.greeta.net
+  redirect-url: ${account-app.base-url}
 
-erp-app:
-  base-url: https://erp.greeta.net
-  redirect-url: ${erp-app.base-url}
-
-movie-app:
-  base-url: https://movie.greeta.net
-  redirect-url: ${movie-app.base-url}
+bank-app:
+  base-url: https://bank.greeta.net
+  redirect-url: ${bank-app.base-url}
 
 logging:
   pattern: 
     console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} %m%n"
+
 
 server.forward-headers-strategy: framework
 
@@ -138,15 +104,15 @@ springdoc:
       - url: /v3/api-docs
         name: API Gateway Service
         primaryName: API Gateway Service
-      - url: /department/v3/api-docs
-        name: Department Service
-        primaryName: Department Service
+      - url: /account-cmd/v3/api-docs
+        name: Account Command Service
+        primaryName: Account Command Service
+      - url: /account-query/v3/api-docs
+        name: Account Query Service
+        primaryName: Account Query Service        
       - url: /employee/v3/api-docs
         name: Employee Service
         primaryName: Employee Service
-      - url: /organization/v3/api-docs
-        name: Organization Service
-        primaryName: Organization Service
-      - url: /movie/v3/api-docs
-        name: Movie Service
-        primaryName: Movie Service
+      - url: /bank/v3/api-docs
+        name: Bank Service
+        primaryName: Bank Service

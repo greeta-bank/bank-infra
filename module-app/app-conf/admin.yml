@@ -1,7 +1,0 @@
-spring:
-  cloud:
-  kubernetes:
-    discovery:
-      all-namespaces: true
-      service-labels:
-        spring-boot: true

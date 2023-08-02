@@ -1,36 +1,22 @@
-resource "kubernetes_config_map_v1" "department" {
+resource "kubernetes_config_map_v1" "bank" {
   metadata {
-    name      = "department"
+    name      = "bank"
     labels = {
-      app = "department"
+      app = "bank"
     }
   }
 
   data = {
-    "application.yml" = file("${path.module}/app-conf/department.yml")
+    "application.yml" = file("${path.module}/app-conf/bank.yml")
   }
 }
 
-resource "kubernetes_secret_v1" "department" {
+resource "kubernetes_deployment_v1" "bank_deployment" {
+  depends_on = [kubernetes_deployment_v1.bank_mysql_deployment]
   metadata {
-    name = "department"
-  }
-
-  data = {
-    "spring.data.mongodb.password" = "UGlvdF8xMjM="
-    "spring.data.mongodb.username" = "cGlvdHI="
-  }
-
-  type = "Opaque"
-}
-
-
-resource "kubernetes_deployment_v1" "department_deployment" {
-  depends_on = [kubernetes_deployment_v1.mongodb]
-  metadata {
-    name = "department"
+    name = "bank"
     labels = {
-      app = "department"
+      app = "bank"
     }
   }
  
@@ -38,13 +24,13 @@ resource "kubernetes_deployment_v1" "department_deployment" {
     replicas = 1
     selector {
       match_labels = {
-        app = "department"
+        app = "bank"
       }
     }
     template {
       metadata {
         labels = {
-          app = "department"
+          app = "bank"
         }
         annotations = {
           "prometheus.io/scrape" = "true"
@@ -56,8 +42,8 @@ resource "kubernetes_deployment_v1" "department_deployment" {
         service_account_name = "spring-cloud-kubernetes"        
         
         container {
-          image = "ghcr.io/greeta-erp/department-service:dc28f57a8b60f7a5e2c361ada321af08bbf82a57"
-          name  = "department"
+          image = "ghcr.io/greeta-erp/bank-service:dc28f57a8b60f7a5e2c361ada321af08bbf82a57"
+          name  = "bank"
           image_pull_policy = "Always"
           port {
             container_port = 8080
@@ -80,7 +66,7 @@ resource "kubernetes_deployment_v1" "department_deployment" {
 
           env {
             name  = "OTEL_SERVICE_NAME"
-            value = "department"
+            value = "bank"
           }
 
           env {
@@ -92,6 +78,19 @@ resource "kubernetes_deployment_v1" "department_deployment" {
             name  = "OTEL_METRICS_EXPORTER"
             value = "none"
           }
+
+          env {
+            name = "SPRING_DATASOURCE_URL"
+            value = "jdbc:mysql://bank-mysql:3306/eazybank"
+          }
+          env {
+            name = "SPRING_DATASOURCE_PASSWORD"
+            value = "dbpassword11"
+          }
+          env {
+            name = "SPRING_SQL_INIT_MODE"
+            value = "ALWAYS"
+          }           
 
           # resources {
           #   requests = {
@@ -136,9 +135,9 @@ resource "kubernetes_deployment_v1" "department_deployment" {
   }
 }
 
-resource "kubernetes_horizontal_pod_autoscaler_v1" "department_hpa" {
+resource "kubernetes_horizontal_pod_autoscaler_v1" "bank_hpa" {
   metadata {
-    name = "department-hpa"
+    name = "bank-hpa"
   }
   spec {
     max_replicas = 2
@@ -146,23 +145,23 @@ resource "kubernetes_horizontal_pod_autoscaler_v1" "department_hpa" {
     scale_target_ref {
       api_version = "apps/v1"
       kind = "Deployment"
-      name = kubernetes_deployment_v1.department_deployment.metadata[0].name 
+      name = kubernetes_deployment_v1.bank_deployment.metadata[0].name 
     }
     target_cpu_utilization_percentage = 70
   }
 }
 
-resource "kubernetes_service_v1" "department_service" {
+resource "kubernetes_service_v1" "bank_service" {
   metadata {
-    name      = "department"
+    name      = "bank"
     labels = {
-      app        = "department"
+      app        = "bank"
       spring-boot = "true"
     }
   }
   spec {
     selector = {
-      app = "department"
+      app = "bank"
     }
     port {
       port = 8080
