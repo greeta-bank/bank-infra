@@ -39,7 +39,7 @@ resource "kubernetes_deployment_v1" "account_postgres" {
         }          
         container {
           name  = "account-postgres"
-          image = "postgres:14.4"
+          image = "postgres:latest"
 
           env {
             name  = "POSTGRES_PASSWORD"

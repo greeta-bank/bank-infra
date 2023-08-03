@@ -18,7 +18,7 @@ spring:
         add-to-simple-url-handler-mapping: true
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "https://bank.greeta.net"
+            allowedOriginPatterns: "*"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
@@ -67,7 +67,7 @@ spring:
     oauth2: 
       resourceserver:
         jwt:
-          issuer-uri: ${spring.keycloak.server-url}/realms/bank-realm
+          issuer-uri: https://keycloak.greeta.net/realms/bank-realm
           jwk-set-uri: ${spring.keycloak.server-url}/realms/bank-realm/protocol/openid-connect/certs
        
 
