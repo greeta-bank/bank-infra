@@ -42,7 +42,7 @@ resource "kubernetes_deployment_v1" "bank_deployment" {
         service_account_name = "spring-cloud-kubernetes"        
         
         container {
-          image = "ghcr.io/greeta-bank/bank-service:14aef774c7298fc8a2e5612fb2d8ba635ed3000d"
+          image = "ghcr.io/greeta-bank/bank-service:91d179ae50940112c773f7e57e0bbd04970525b9"
           name  = "bank"
           image_pull_policy = "Always"
           port {
