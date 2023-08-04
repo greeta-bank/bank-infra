@@ -49,6 +49,32 @@ spring:
           issuer-uri: https://keycloak.greeta.net/realms/bank-realm
           jwk-set-uri: ${spring.keycloak.server-url}/realms/bank-realm/protocol/openid-connect/certs
 
+kafka-config:
+  bootstrap-servers: bitnami-kafka:9092
+  num-of-partitions: 1
+  replication-factor: 1
+
+kafka-consumer-config:
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  group-id: bankaccConsumer
+  auto-offset-reset: earliest
+  batch-listener: true
+  auto-startup: true
+  concurrency-level: 3
+  session-timeout-ms: 10000
+  heartbeat-interval-ms: 3000
+  max-poll-interval-ms: 300000
+  max-poll-records: 500
+  max-partition-fetch-bytes-default: 1048576
+  max-partition-fetch-bytes-boost-factor: 1
+  poll-timeout-ms: 150
+  properties:
+  spring:
+    json:
+      trusted:
+        packages: '*'
+
 
 logging:
   pattern:

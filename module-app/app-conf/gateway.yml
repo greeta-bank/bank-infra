@@ -83,7 +83,7 @@ account-app:
 
 bank-app:
   base-url: https://bank.greeta.net
-  redirect-url: ${bank-app.base-url}
+  redirect-url: ${bank-app.base-url}/dashboard
 
 logging:
   pattern: 

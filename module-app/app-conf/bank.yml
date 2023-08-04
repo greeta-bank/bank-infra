@@ -11,8 +11,8 @@ spring:
       hibernate.format_sql: true
   sql:
     init:
-      mode: NEVER
-      schema-locations: classpath:init-schema.sql,classpath:init-data.sql
+      mode: ALWAYS
+      schema-locations: classpath:sql/scripts.sql
   output:
     ansi:
       enabled: ALWAYS

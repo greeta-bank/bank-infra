@@ -10,7 +10,7 @@ spring:
     producer:
       bootstrap-servers: bitnami-kafka:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer      
   output:
     ansi:
       enabled: ALWAYS
@@ -22,6 +22,21 @@ spring:
         jwt:
           issuer-uri: https://keycloak.greeta.net/realms/bank-realm
           jwk-set-uri: ${spring.keycloak.server-url}/realms/bank-realm/protocol/openid-connect/certs
+
+kafka-config:
+  bootstrap-servers: bitnami-kafka:9092
+  num-of-partitions: 1
+  replication-factor: 1
+
+kafka-producer-config:
+  key-serializer-class: org.apache.kafka.common.serialization.StringDeserializer
+  value-serializer-class: org.springframework.kafka.support.serializer.JsonDeserializer
+  acks: all
+  batch-size: 16384
+  batch-size-boost-factor: 100
+  linger-ms: 5
+  request-timeout-ms: 60000
+  retry-count: 5         
 
 
 logging:

@@ -24,16 +24,16 @@ resource "kubernetes_pod_v1" "kafka_client_pod" {
   }
 }
 
-# resource "null_resource" "copy_script" {
-#   provisioner "local-exec" {
-#     command = "kubectl cp ${path.module}/create-topics.sh ${kubernetes_pod_v1.kafka_client_pod.metadata.0.name}:/kafka-client-storage"
-#   }
-#   depends_on = [null_resource.update_kubeconfig]
-# }
+resource "null_resource" "copy_script" {
+  provisioner "local-exec" {
+    command = "kubectl cp ${path.module}/create-topics.sh ${kubernetes_pod_v1.kafka_client_pod.metadata.0.name}:/kafka-client-storage"
+  }
+  depends_on = [null_resource.update_kubeconfig]
+}
 
-# resource "null_resource" "execute_script" {
-#   provisioner "local-exec" {
-#     command = "kubectl exec -it ${kubernetes_pod_v1.kafka_client_pod.metadata.0.name} -- /bin/bash -c 'cd ../.. && cd kafka-client-storage && sh create-topics.sh'"
-#   }
-#   depends_on = [null_resource.copy_script]
-# }
+resource "null_resource" "execute_script" {
+  provisioner "local-exec" {
+    command = "kubectl exec -it ${kubernetes_pod_v1.kafka_client_pod.metadata.0.name} -- /bin/bash -c 'cd ../.. && cd kafka-client-storage && sh create-topics.sh'"
+  }
+  depends_on = [null_resource.copy_script]
+}
